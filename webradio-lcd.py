@@ -2,6 +2,7 @@
 import time
 import RPi.GPIO as GPIO
 import os
+import re
 import codecs
 import subprocess
 from subprocess import *
@@ -118,8 +119,9 @@ if __name__ == '__main__':
   i = 0
 
   while i < 10:
-    title = subprocess.run(['mpc', 'current'], stdout=subprocess.PIPE).stdout.decode('utf-8',)
-#    title = run_cmd('mpc current | tr -d \'\n\'')
+    title = subprocess.run(['mpc', 'current'], stdout=subprocess.PIPE).stdout.decode('ascii',errors='ignore')
+    title = re.sub(r'[^\x00-\x7f]',r'', title)
+    title = re.sub("\n|\r", "", title)
     lcd_send_byte(LCD_LINE_1, LCD_CMD)
     lcd_message(title[0:20])
     lcd_send_byte(LCD_LINE_2, LCD_CMD)
